@@ -5,6 +5,7 @@
 #include <BtIfDefinitions.h>
 #include <BtIfClasses.h>
 #include <com_error.h>
+#include <port3.h>
 
 #include "util.h"
 
@@ -53,7 +54,7 @@ get_scn (PyObject *s)
 {
     WCRfCommIfPyObject *self = (WCRfCommIfPyObject*) s;
 
-    return PyLong_FromLong (self->rfcommif->GetScn ());
+    return PyInt_FromLong (self->rfcommif->GetScn ());
 }
 
 static PyObject *
@@ -88,7 +89,7 @@ static PyMethodDef wcrfcommif_methods[] = {
 static PyObject *
 wcrfcommif_repr(WCRfCommIfPyObject *s)
 {
-    return PyUnicode_FromString("_WCRfCommIf object");
+    return PyString_FromString("_WCRfCommIf object");
 }
 
 static PyObject *

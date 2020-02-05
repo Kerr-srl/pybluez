@@ -41,6 +41,7 @@ Local naming conventions:
 #include <bluetooth/l2cap.h>
 #include <bluetooth/sco.h>
 
+#include <port3.h>
 #include <bluetooth/sdp.h>
 #include <bluetooth/sdp_lib.h>
 #include "btsdp.h"
@@ -644,7 +645,7 @@ sock_setblocking(PySocketSockObject *s, PyObject *arg)
 {
 	int block;
 
-	block = PyLong_AsLong(arg);
+	block = PyInt_AsLong(arg);
 	if (block == -1 && PyErr_Occurred())
 		return NULL;
 
@@ -774,21 +775,21 @@ sock_getsockopt(PySocketSockObject *s, PyObject *args)
 		res = getsockopt(s->sock_fd, level, optname, (void *)&flag, &flagsize);
 		if (res < 0)
 			return s->errorhandler();
-		return PyLong_FromLong(flag);
+		return PyInt_FromLong(flag);
     } else if (buflen <= 0 || buflen > 1024) {
         PyErr_SetString(bluetooth_error, "getsockopt buflen out of range");
         return NULL;
     } else {
-        PyObject *buf = PyBytes_FromStringAndSize((char *)NULL, buflen);
+        PyObject *buf = PyString_FromStringAndSize((char *)NULL, buflen);
         if (buf == NULL)
             return NULL;
         res = getsockopt(s->sock_fd, level, optname,
-                 (void *)PyBytes_AS_STRING(buf), &buflen);
+                 (void *)PyString_AS_STRING(buf), &buflen);
         if (res < 0) {
             Py_DECREF(buf);
             return s->errorhandler();
         }
-        _PyBytes_Resize(&buf, buflen);
+        _PyString_Resize(&buf, buflen);
         return buf;
 	}
     return NULL;
@@ -977,7 +978,7 @@ sock_connect_ex(PySocketSockObject *s, PyObject *addro)
 	res = internal_connect(s, &addr, addrlen, &timeout);
 	Py_END_ALLOW_THREADS
 
-	return PyLong_FromLong((long) res);
+	return PyInt_FromLong((long) res);
 }
 
 PyDoc_STRVAR(connect_ex_doc,
@@ -992,7 +993,7 @@ instead of raising an exception when an error occurs.");
 static PyObject *
 sock_fileno(PySocketSockObject *s)
 {
-	return PyLong_FromLong((long) s->sock_fd);
+	return PyInt_FromLong((long) s->sock_fd);
 }
 
 PyDoc_STRVAR(fileno_doc,
@@ -1093,7 +1094,7 @@ sock_listen(PySocketSockObject *s, PyObject *arg)
 	int backlog;
 	int res;
 
-	backlog = PyLong_AsLong(arg);
+	backlog = PyInt_AsLong(arg);
 	if (backlog == -1 && PyErr_Occurred())
 		return NULL;
 	Py_BEGIN_ALLOW_THREADS
@@ -1171,14 +1172,14 @@ sock_recv(PySocketSockObject *s, PyObject *args)
 		return NULL;
 	}
 
-	buf = PyBytes_FromStringAndSize((char *) 0, len);
+	buf = PyString_FromStringAndSize((char *) 0, len);
 	if (buf == NULL)
 		return NULL;
 
 	Py_BEGIN_ALLOW_THREADS
 	timeout = internal_select(s, 0);
 	if (!timeout)
-		n = recv(s->sock_fd, PyBytes_AS_STRING(buf), len, flags);
+		n = recv(s->sock_fd, PyString_AS_STRING(buf), len, flags);
 	Py_END_ALLOW_THREADS
 
 	if (timeout) {
@@ -1191,7 +1192,7 @@ sock_recv(PySocketSockObject *s, PyObject *args)
 		return s->errorhandler();
 	}
 	if (n != len)
-		_PyBytes_Resize(&buf, n);
+		_PyString_Resize(&buf, n);
 	return buf;
 }
 
@@ -1221,7 +1222,7 @@ sock_recvfrom(PySocketSockObject *s, PyObject *args)
 
 	if (!getsockaddrlen(s, &addrlen))
 		return NULL;
-	buf = PyUnicode_FromStringAndSize((char *) 0, len);
+	buf = PyString_FromStringAndSize((char *) 0, len);
 	if (buf == NULL)
 		return NULL;
 
@@ -1229,7 +1230,7 @@ sock_recvfrom(PySocketSockObject *s, PyObject *args)
 	memset(addrbuf, 0, addrlen);
 	timeout = internal_select(s, 0);
 	if (!timeout)
-		n = recvfrom(s->sock_fd, PyBytes_AS_STRING(buf), len, flags,
+		n = recvfrom(s->sock_fd, PyString_AS_STRING(buf), len, flags,
 			     (void *)addrbuf, &addrlen
 			);
 	Py_END_ALLOW_THREADS
@@ -1244,7 +1245,7 @@ sock_recvfrom(PySocketSockObject *s, PyObject *args)
 		return s->errorhandler();
 	}
 
-	if (n != len && _PyBytes_Resize(&buf, n) < 0)
+	if (n != len && _PyString_Resize(&buf, n) < 0)
 		return NULL;
 
 	if (!(addr = makesockaddr(s, (struct sockaddr *)addrbuf, addrlen)))
@@ -1287,7 +1288,7 @@ sock_send(PySocketSockObject *s, PyObject *args)
 	}
 	if (n < 0)
 		return s->errorhandler();
-	return PyLong_FromLong((long)n);
+	return PyInt_FromLong((long)n);
 }
 
 PyDoc_STRVAR(send_doc,
@@ -1379,7 +1380,7 @@ sock_sendto(PySocketSockObject *s, PyObject *args)
 	}
 	if (n < 0)
 		return s->errorhandler();
-	return PyLong_FromLong((long)n);
+	return PyInt_FromLong((long)n);
 }
 
 PyDoc_STRVAR(sendto_doc,
@@ -1397,7 +1398,7 @@ sock_shutdown(PySocketSockObject *s, PyObject *arg)
 	int how;
 	int res;
 
-	how = PyLong_AsLong(arg);
+	how = PyInt_AsLong(arg);
 	if (how == -1 && PyErr_Occurred())
 		return NULL;
 	Py_BEGIN_ALLOW_THREADS
@@ -1540,7 +1541,7 @@ sock_repr(PySocketSockObject *s)
 		(long)s->sock_fd, s->sock_family,
 		s->sock_type,
 		s->sock_proto);
-	return PyUnicode_FromString(buf);
+	return PyString_FromString(buf);
 }
 
 
@@ -1699,7 +1700,7 @@ bt_btohs(PyObject *self, PyObject *args)
 		return NULL;
 	}
 	x2 = (int)btohs((short)x1);
-	return PyLong_FromLong(x2);
+	return PyInt_FromLong(x2);
 }
 
 PyDoc_STRVAR(bt_btohs_doc,
@@ -1718,8 +1719,8 @@ bt_btohl(PyObject *self, PyObject *args)
 		return NULL;
 	}
 
-	if (PyLong_Check(arg)) {
-		x = PyLong_AS_LONG(arg);
+	if (PyInt_Check(arg)) {
+		x = PyInt_AS_LONG(arg);
 		if (x == (unsigned long) -1 && PyErr_Occurred())
 			return NULL;
 	}
@@ -1745,7 +1746,7 @@ bt_btohl(PyObject *self, PyObject *args)
 				    arg->ob_type->tp_name);
 	if (x == (unsigned long) -1 && PyErr_Occurred())
 		return NULL;
-	return PyLong_FromLong(btohl(x));
+	return PyInt_FromLong(btohl(x));
 }
 
 PyDoc_STRVAR(bt_btohl_doc,
@@ -1763,7 +1764,7 @@ bt_htobs(PyObject *self, PyObject *args)
 		return NULL;
 	}
 	x2 = (int)htobs((short)x1);
-	return PyLong_FromLong(x2);
+	return PyInt_FromLong(x2);
 }
 
 PyDoc_STRVAR(bt_htobs_doc,
@@ -1782,8 +1783,8 @@ bt_htobl(PyObject *self, PyObject *args)
 		return NULL;
 	}
 
-	if (PyLong_Check(arg)) {
-		x = PyLong_AS_LONG(arg);
+	if (PyInt_Check(arg)) {
+		x = PyInt_AS_LONG(arg);
 		if (x == (unsigned long) -1 && PyErr_Occurred())
 			return NULL;
 	}
@@ -1807,7 +1808,7 @@ bt_htobl(PyObject *self, PyObject *args)
 		return PyErr_Format(PyExc_TypeError,
 				    "expected int/long, %s found",
 				    arg->ob_type->tp_name);
-	return PyLong_FromLong(htobl(x));
+	return PyInt_FromLong(htobl(x));
 }
 
 //static PyObject *
@@ -1816,7 +1817,7 @@ bt_htobl(PyObject *self, PyObject *args)
 //	int protocol = -1;
 //    int s;
 //
-//	protocol = PyLong_AsLong(arg);
+//	protocol = PyInt_AsLong(arg);
 //
 //	if (protocol == -1 && PyErr_Occurred())
 //		return NULL;
@@ -2047,7 +2048,7 @@ bt_hci_send_req(PyObject *self, PyObject *args, PyObject *kwds)
 
     if( err< 0 ) return socko->errorhandler();
 
-    return PyUnicode_FromStringAndSize(rparam, req.rlen);
+    return PyString_FromStringAndSize(rparam, req.rlen);
 }
 PyDoc_STRVAR(bt_hci_send_req_doc,
 "hci_send_req(sock, ogf, ocf, event, rlen, params=None, timeout=0)\n\
@@ -2120,7 +2121,7 @@ bt_hci_inquiry(PyObject *self, PyObject *args, PyObject *kwds)
 
         ba2str( &(info+i)->bdaddr, ba_name );
         
-        addr_entry = PyUnicode_FromString( ba_name );
+        addr_entry = PyString_FromString( ba_name );
 
         if (lookup_class) {
             PyObject *item_tuple = PyTuple_New(2);
@@ -2128,7 +2129,7 @@ bt_hci_inquiry(PyObject *self, PyObject *args, PyObject *kwds)
             int dev_class = (info+i)->dev_class[2] << 16 |
                             (info+i)->dev_class[1] << 8 |
                             (info+i)->dev_class[0];
-            PyObject *class_entry = PyLong_FromLong( dev_class );
+            PyObject *class_entry = PyInt_FromLong( dev_class );
 
             err = PyTuple_SetItem( item_tuple, 0, addr_entry );
             if (err) {
@@ -2201,7 +2202,7 @@ bt_hci_read_remote_name(PyObject *self, PyObject *args, PyObject *kwds)
     if( err < 0) 
         return PyErr_SetFromErrno(bluetooth_error);
 
-    return PyUnicode_FromString( name );
+    return PyString_FromString( name );
 }
 PyDoc_STRVAR(bt_hci_read_remote_name_doc,
 "hci_read_remote_name(sock, bdaddr, timeout=5192)\n\
@@ -2223,7 +2224,7 @@ bt_hci_opcode_name(PyObject *self, PyObject *args)
         // DPRINTF("opcode = %x\n", opcode);
         const char* cmd_name = opcode2str (opcode);
 
-    return PyUnicode_FromString( cmd_name );
+    return PyString_FromString( cmd_name );
 }
 PyDoc_STRVAR(bt_hci_opcode_name_doc,
 "hci_opcode_name(opcode)\n\
@@ -2249,7 +2250,7 @@ bt_hci_event_name(PyObject *self, PyObject *args)
            return 0;
    }
    const char* event_name = event_str[eventNum];
-   return PyUnicode_FromString( event_name );
+   return PyString_FromString( event_name );
 }
 PyDoc_STRVAR(bt_hci_event_name_doc,
 "hci_event_name(eventNum)\n\
@@ -2273,7 +2274,7 @@ static PyObject * bt_hci_filter_ ## name (PyObject *self, PyObject *args )\
         return 0; \
     } \
     hci_filter_ ## name ( arg, (struct hci_filter*)param ); \
-    return PyUnicode_FromStringAndSize(param, len); \
+    return PyString_FromStringAndSize(param, len); \
 } \
 PyDoc_STRVAR(bt_hci_filter_ ## name ## _doc, docstring);
 
@@ -2302,7 +2303,7 @@ static PyObject * bt_hci_filter_ ## name (PyObject *self, PyObject *args )\
         return 0; \
     } \
     hci_filter_ ## name ( (struct hci_filter*)param ); \
-    return PyUnicode_FromStringAndSize(param, len); \
+    return PyString_FromStringAndSize(param, len); \
 } \
 PyDoc_STRVAR(bt_hci_filter_ ## name ## _doc, docstring);
 
@@ -2359,7 +2360,7 @@ bt_ba2str(PyObject *self, PyObject *args)
     char ba_str[19] = {0};
     if (!PyArg_ParseTuple(args, "s#", &data, &len)) return 0;
     ba2str((bdaddr_t*)data, ba_str);
-    return PyUnicode_FromString( ba_str );
+    return PyString_FromString( ba_str );
 //    return Py_BuildValue("s#", ba_str, 18);
 }
 PyDoc_STRVAR(bt_ba2str_doc,
@@ -2374,7 +2375,7 @@ bt_str2ba(PyObject *self, PyObject *args)
     bdaddr_t ba;
     if (!PyArg_ParseTuple(args, "s", &ba_str)) return 0;
     str2ba( ba_str, &ba );
-    return Py_BuildValue("y#", (char*)(&ba), sizeof(ba));
+    return Py_BuildValue(BYTES_FORMAT_CHR, (char*)(&ba), sizeof(ba));
 }
 PyDoc_STRVAR(bt_str2ba_doc,
 "str2ba(string)\n\
@@ -2493,7 +2494,7 @@ bt_hci_get_route(PyObject *self, PyObject *args)
     if (dev_id < 0) {
         return PyErr_SetFromErrno(PyExc_OSError);
     }
-    return PyLong_FromLong(dev_id);
+    return PyInt_FromLong(dev_id);
 }
 PyDoc_STRVAR( bt_hci_get_route_doc,
 "hci_get_route(address)\n\

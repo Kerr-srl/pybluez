@@ -5,6 +5,7 @@
 #include <BtIfClasses.h>
 #include <com_error.h>
 #include "util.h"
+#include <port3.h>
 
 #include "inquirer.hpp"
 
@@ -22,7 +23,7 @@ static void
 dict_set_str_pyobj(PyObject *dict, const char *key, PyObject *valobj)
 {
     PyObject *keyobj;
-    keyobj = PyUnicode_FromString (key);
+    keyobj = PyString_FromString (key);
     PyDict_SetItem (dict, keyobj, valobj);
     Py_DECREF (keyobj);
 }
@@ -31,8 +32,8 @@ static void
 dict_set_strings(PyObject *dict, const char *key, const char *val)
 {
     PyObject *keyobj, *valobj;
-    keyobj = PyUnicode_FromString (key);
-    valobj = PyUnicode_FromString (val);
+    keyobj = PyString_FromString (key);
+    valobj = PyString_FromString (val);
     PyDict_SetItem (dict, keyobj, valobj);
     Py_DECREF (keyobj);
     Py_DECREF (valobj);
@@ -42,8 +43,8 @@ static void
 dict_set_str_long(PyObject *dict, const char *key, long val)
 {
     PyObject *keyobj, *valobj;
-    keyobj = PyUnicode_FromString (key);
-    valobj = PyLong_FromLong(val);
+    keyobj = PyString_FromString (key);
+    valobj = PyInt_FromLong(val);
     PyDict_SetItem (dict, keyobj, valobj);
     Py_DECREF (keyobj);
     Py_DECREF (valobj);
@@ -215,14 +216,14 @@ static PyObject *
 get_sockport (PyObject *s)
 {
     WCInquirerPyObject *self = (WCInquirerPyObject*) s;
-    return PyLong_FromLong (self->inq->GetSockPort ());
+    return PyInt_FromLong (self->inq->GetSockPort ());
 }
 
 static PyObject *
 accept_client (PyObject *s)
 {
     WCInquirerPyObject *self = (WCInquirerPyObject*) s;
-    return PyLong_FromLong (self->inq->AcceptClient ());
+    return PyInt_FromLong (self->inq->AcceptClient ());
 }
 
 static PyObject * 
@@ -302,7 +303,7 @@ get_local_device_name (PyObject *s)
     WCInquirerPyObject *self = (WCInquirerPyObject*) s;
     BD_NAME name;
     if (self->inq->GetLocalDeviceName (&name)) {
-        return PyUnicode_FromString ( (const char *)name);
+        return PyString_FromString ( (const char *)name);
     } else {
         Py_RETURN_NONE;
     }
@@ -440,7 +441,7 @@ read_discovery_records (PyObject *s, PyObject *args)
 //                            u[8], u[9], u[10], u[11],
 //                            u[12], u[13], u[14], u[15]);
 //                    printf ("%s\n", buf);
-//                    PyObject *uuid_pyobj = PyUnicode_FromString (buf);
+//                    PyObject *uuid_pyobj = PyString_FromString (buf);
 //                    PyList_Append (uuid_list, uuid_pyobj);
 //                    Py_DECREF (uuid_pyobj);
 //                } else {
@@ -492,7 +493,7 @@ get_btw_version_info (PyObject *s)
     char buf[MAX_PATH];
     BOOL result = self->inq->GetBTWVersionInfo (buf, MAX_PATH);
     if (result) {
-        return PyUnicode_FromString (buf);
+        return PyString_FromString (buf);
     } else {
         Py_RETURN_NONE;
     }
@@ -525,7 +526,7 @@ static PyMethodDef wcinquirer_methods[] = {
 static PyObject *
 wcinquirer_repr(WCInquirerPyObject *s)
 {
-    return PyUnicode_FromString("_WCInquirer object");
+    return PyString_FromString("_WCInquirer object");
 }
 
 static PyObject *

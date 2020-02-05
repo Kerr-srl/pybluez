@@ -4,6 +4,7 @@
 #include <BtIfDefinitions.h>
 #include <BtIfClasses.h>
 #include <com_error.h>
+#include <port3.h>
 
 #include "rfcommport.hpp"
 
@@ -132,14 +133,14 @@ static PyObject *
 get_sockport (PyObject *s)
 {
     WCRfCommPortPyObject *self = (WCRfCommPortPyObject*) s;
-    return PyLong_FromLong (self->rfcp->GetSockPort ());
+    return PyInt_FromLong (self->rfcp->GetSockPort ());
 }
 
 static PyObject *
 accept_client (PyObject *s)
 {
     WCRfCommPortPyObject *self = (WCRfCommPortPyObject*) s;
-    return PyLong_FromLong (self->rfcp->AcceptClient ());
+    return PyInt_FromLong (self->rfcp->AcceptClient ());
 }
 
 static PyObject *
@@ -154,7 +155,7 @@ wc_open_server (PyObject *s, PyObject *args)
     CRfCommPort::PORT_RETURN_CODE result = 
         self->rfcp->OpenServer (scn, desired_mtu);
 
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
@@ -184,7 +185,7 @@ wc_open_client (PyObject *s, PyObject *args)
     result = self->rfcp->OpenClient (scn, bdaddr, desired_mtu);
     Py_END_ALLOW_THREADS;
 
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
@@ -212,18 +213,18 @@ static PyObject *
 wc_set_flow_enabled (PyObject *s, PyObject *arg)
 {
     _WCRfCommPortPyObject *self = (_WCRfCommPortPyObject*) s;
-    int enable = PyLong_AsLong (arg);
+    int enable = PyInt_AsLong (arg);
     CRfCommPort::PORT_RETURN_CODE result = self->rfcp->SetFlowEnabled (enable);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
 wc_set_modem_signal (PyObject *s, PyObject *arg)
 {
     _WCRfCommPortPyObject *self = (_WCRfCommPortPyObject*) s;
-    UINT8 signal = static_cast <UINT8> (PyLong_AsLong (arg));
+    UINT8 signal = static_cast <UINT8> (PyInt_AsLong (arg));
     CRfCommPort::PORT_RETURN_CODE result = self->rfcp->SetModemSignal (signal);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
@@ -239,18 +240,18 @@ static PyObject *
 wc_send_error (PyObject *s, PyObject *arg)
 {
     _WCRfCommPortPyObject *self = (_WCRfCommPortPyObject*) s;
-    UINT8 errors = static_cast <UINT8> (PyLong_AsLong (arg));
+    UINT8 errors = static_cast <UINT8> (PyInt_AsLong (arg));
     CRfCommPort::PORT_RETURN_CODE result = self->rfcp->SendError (errors);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
 wc_purge (PyObject *s, PyObject *arg)
 {
     _WCRfCommPortPyObject *self = (_WCRfCommPortPyObject*) s;
-    UINT8 purge_flags = static_cast <UINT8> (PyLong_AsLong (arg));
+    UINT8 purge_flags = static_cast <UINT8> (PyInt_AsLong (arg));
     CRfCommPort::PORT_RETURN_CODE result = self->rfcp->Purge (purge_flags);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
@@ -294,19 +295,19 @@ wc_switch_role (PyObject *s, PyObject *arg)
 {
     _WCRfCommPortPyObject *self = (_WCRfCommPortPyObject*) s;
     MASTER_SLAVE_ROLE new_role = 
-        static_cast <MASTER_SLAVE_ROLE> (PyLong_AsLong (arg));
+        static_cast <MASTER_SLAVE_ROLE> (PyInt_AsLong (arg));
     BOOL result = self->rfcp->SwitchRole (new_role);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
 wc_set_link_supervision_timeout (PyObject *s, PyObject *arg)
 {
     _WCRfCommPortPyObject *self = (_WCRfCommPortPyObject*) s;
-    UINT16 timeoutSlot = static_cast <UINT16> (PyLong_AsLong (arg));
+    UINT16 timeoutSlot = static_cast <UINT16> (PyInt_AsLong (arg));
     CRfCommPort::PORT_RETURN_CODE result = 
         self->rfcp->SetLinkSupervisionTimeOut (timeoutSlot);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyMethodDef wcrfcommport_methods[] = {
@@ -333,7 +334,7 @@ static PyMethodDef wcrfcommport_methods[] = {
 static PyObject *
 wcrfcommport_repr(WCRfCommPortPyObject *s)
 {
-    return PyUnicode_FromString("_WCRfCommPort object");
+    return PyString_FromString("_WCRfCommPort object");
 }
 
 static PyObject *

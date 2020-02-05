@@ -4,6 +4,7 @@
 #include <BtIfDefinitions.h>
 #include <BtIfClasses.h>
 #include <com_error.h>
+#include <port3.h>
 
 #include "l2capconn.hpp"
 #include "l2capif.hpp"
@@ -153,14 +154,14 @@ static PyObject *
 get_sockport (PyObject *s)
 {
     WCL2CapConnPyObject *self = (WCL2CapConnPyObject*) s;
-    return PyLong_FromLong (self->l2cap->GetSockPort ());
+    return PyInt_FromLong (self->l2cap->GetSockPort ());
 }
 
 static PyObject *
 accept_client (PyObject *s)
 {
     WCL2CapConnPyObject *self = (WCL2CapConnPyObject*) s;
-    return PyLong_FromLong (self->l2cap->AcceptClient ());
+    return PyInt_FromLong (self->l2cap->AcceptClient ());
 }
 
 static PyObject *
@@ -235,7 +236,7 @@ wc_connect (PyObject *s, PyObject *args)
     result = self->l2cap->Connect (l2cap_if->l2capif, bdaddr, desired_mtu);
     Py_END_ALLOW_THREADS;
 
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
@@ -307,9 +308,9 @@ wc_switch_role (PyObject *s, PyObject *arg)
     dbg ("%s:%d:%s\n", __FILE__, __LINE__, __FUNCTION__);
 
     MASTER_SLAVE_ROLE new_role = 
-        static_cast <MASTER_SLAVE_ROLE> (PyLong_AsLong (arg));
+        static_cast <MASTER_SLAVE_ROLE> (PyInt_AsLong (arg));
     BOOL result = self->l2cap->SwitchRole (new_role);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyObject *
@@ -318,9 +319,9 @@ wc_set_link_supervision_timeout (PyObject *s, PyObject *arg)
     _WCL2CapConnPyObject *self = (_WCL2CapConnPyObject*) s;
     dbg ("%s:%d:%s\n", __FILE__, __LINE__, __FUNCTION__);
 
-    UINT16 timeoutSlot = static_cast <UINT16> (PyLong_AsLong (arg));
+    UINT16 timeoutSlot = static_cast <UINT16> (PyInt_AsLong (arg));
     BOOL result = self->l2cap->SetLinkSupervisionTimeOut (timeoutSlot);
-    return PyLong_FromLong (result);
+    return PyInt_FromLong (result);
 }
 
 static PyMethodDef wcl2capconn_methods[] = {
@@ -343,7 +344,7 @@ static PyMethodDef wcl2capconn_methods[] = {
 static PyObject *
 wcl2capconn_repr(WCL2CapConnPyObject *s)
 {
-    return PyUnicode_FromString("_WCL2CapConn object");
+    return PyString_FromString("_WCL2CapConn object");
 }
 
 static PyObject *

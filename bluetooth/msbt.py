@@ -1,6 +1,8 @@
 from bluetooth import *
 import bluetooth._msbt as bt
 
+
+
 bt.initwinsock ()
 
 # ============== SDP service registration and unregistration ============

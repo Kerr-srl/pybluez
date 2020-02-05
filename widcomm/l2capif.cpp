@@ -5,6 +5,7 @@
 #include <BtIfDefinitions.h>
 #include <BtIfClasses.h>
 #include <com_error.h>
+#include <port3.h>
 
 #include "util.h"
 #include "l2capif.hpp"
@@ -56,7 +57,7 @@ static PyObject *
 wc_register (PyObject *s)
 {
     WCL2CapIfPyObject *self = (WCL2CapIfPyObject*) s;
-    return PyLong_FromLong (self->l2capif->Register ());
+    return PyInt_FromLong (self->l2capif->Register ());
 }
 
 static PyObject *
@@ -72,7 +73,7 @@ get_psm (PyObject *s)
 {
     WCL2CapIfPyObject *self = (WCL2CapIfPyObject*) s;
 
-    return PyLong_FromLong (self->l2capif->GetPsm ());
+    return PyInt_FromLong (self->l2capif->GetPsm ());
 }
 
 static PyObject *
@@ -113,7 +114,7 @@ static PyMethodDef wcl2capif_methods[] = {
 static PyObject *
 wcl2capif_repr(WCL2CapIfPyObject *s)
 {
-    return PyUnicode_FromString("_WCL2CapIf object");
+    return PyString_FromString("_WCL2CapIf object");
 }
 
 static PyObject *
