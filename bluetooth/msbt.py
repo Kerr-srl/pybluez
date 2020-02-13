@@ -248,7 +248,8 @@ def find_service (name = None, uuid = None, address = None):
             record = sdp_parse_raw_record (raw)
 
             if SERVICE_CLASS_ID_LIST_ATTRID in record:
-                svc_class_id_list = [ t[1] for t in \
+                svc_class_id_list = [ (t[1].decode("ascii") if \
+                    type(t[1]) == bytes else t[1]) for t in \
                         record[SERVICE_CLASS_ID_LIST_ATTRID] ]
                 dict["service-classes"] = svc_class_id_list
             else:
@@ -259,7 +260,9 @@ def find_service (name = None, uuid = None, address = None):
                 for profile_desc in \
                         record[BLUETOOTH_PROFILE_DESCRIPTOR_LIST_ATTRID]:
                     uuidpair, versionpair = profile_desc[1]
-                    pdl.append ((uuidpair[1], versionpair[1]))
+                    pdl.append ((uuidpair[1].decode("ascii") if \
+                        type(uuidpair[1]) == bytes else \
+                            uuidpair[1], versionpair[1]))
                 dict["profiles"] = pdl
             else:
                 dict["profiles"] = []
@@ -267,11 +270,6 @@ def find_service (name = None, uuid = None, address = None):
             dict["provider"] = record.get (PROVIDER_NAME_ATTRID, None)
 
             dict["service-id"] = record.get (SERVICE_ID_ATTRID, None)
-
-            # XXX the C version is buggy (retrieves an extra byte or two),
-            # so get the service name here even though it may have already
-            # been set
-            dict["name"] = record.get (SERVICE_NAME_ATTRID, None)
 
             dict["handle"] = record.get (SERVICE_RECORD_HANDLE_ATTRID, None)
         

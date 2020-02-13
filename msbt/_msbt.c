@@ -1,7 +1,3 @@
-#ifndef UNICODE
-#define UNICODE
-#endif
-
 #include <winsock2.h>
 #include <ws2bth.h>
 #include <BluetoothAPIs.h>
@@ -157,7 +153,7 @@ PyDoc_STRVAR(msbt_socket_doc, "TODO");
 static PyObject *
 msbt_bind(PyObject *self, PyObject *args)
 {
-    wchar_t *addrstr = NULL;
+    char *addrstr = NULL;
     int addrstrlen = -1;
     int sockfd = -1;
     int port = -1;
@@ -237,7 +233,7 @@ static PyObject *
 msbt_connect(PyObject *self, PyObject *args)
 {
     int sockfd = -1;
-    wchar_t *addrstr = NULL;
+    char *addrstr = NULL;
     int port = -1;
     SOCKADDR_BTH sa = { 0 };
     int sa_len = sizeof(sa);
@@ -550,7 +546,7 @@ msbt_lookup_name(PyObject *self, PyObject *args)
     BLUETOOTH_FIND_RADIO_PARAMS p = { sizeof(p) };
     HBLUETOOTH_RADIO_FIND fhandle = NULL;
     BLUETOOTH_DEVICE_INFO dinfo = { 0 };
-    wchar_t *addrstr = NULL;
+    char *addrstr = NULL;
     SOCKADDR_BTH sa = { 0 };
     int sa_len = sizeof(sa);
     DWORD status;
@@ -606,7 +602,7 @@ msbt_find_service(PyObject *self, PyObject *args)
 	qs->dwSize = sizeof(WSAQUERYSET);
 	qs->dwNameSpace = NS_BTH;
     qs->dwNumberOfCsAddrs = 0;
-    qs->lpszContext = (LPWSTR) localAddressBuf;
+    qs->lpszContext = (LPSTR) localAddressBuf;
 
     if( 0 == strcmp( addrstr, "localhost" ) ) {
         // find the Bluetooth address of the first local adapter. 
@@ -699,10 +695,10 @@ msbt_find_service(PyObject *self, PyObject *args)
             dict_set_strings( record, "host", localAddressBuf );
             
             // set service name
-            dict_set_strings( record, "name", (const char*) qs->lpszServiceInstanceName );
+            dict_set_strings( record, "name", qs->lpszServiceInstanceName );
 
             // set description
-            dict_set_strings( record, "description", (const char*) qs->lpszComment );
+            dict_set_strings( record, "description", qs->lpszComment );
 
             // set protocol and port
             csinfo = qs->lpcsaBuffer;
@@ -725,7 +721,7 @@ msbt_find_service(PyObject *self, PyObject *args)
             }
 
             // add the raw service record to be parsed in python
-            rawrecord = PyUnicode_FromStringAndSize( qs->lpBlob->pBlobData, 
+            rawrecord = PyBytes_FromStringAndSize( qs->lpBlob->pBlobData, 
                     qs->lpBlob->cbSize );
             dict_set_str_pyobj(record, "rawrecord", rawrecord);
             Py_DECREF(rawrecord);
@@ -822,8 +818,8 @@ msbt_set_service(PyObject *self, PyObject *args)
 
 	SOCKADDR_BTH sa = { 0 };
 	int sa_len = sizeof(sa);
-    wchar_t *service_name = NULL;
-    wchar_t *service_desc = NULL;
+    char *service_name = NULL;
+    char *service_desc = NULL;
     char *service_class_id_str = NULL;
 	CSADDR_INFO sockInfo = { 0 };
     GUID uuid = { 0 };
