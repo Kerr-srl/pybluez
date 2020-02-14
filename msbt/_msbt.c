@@ -7,6 +7,7 @@
 #include <initguid.h>
 #include <wchar.h>
 
+
 #if 1
 static void dbg(const char *fmt, ...)
 {
@@ -239,16 +240,15 @@ msbt_connect(PyObject *self, PyObject *args)
     int sa_len = sizeof(sa);
     DWORD status;
 
-    if(!PyArg_ParseTuple(args, "iui", &sockfd, &addrstr, &port)) return 0;
+    if(!PyArg_ParseTuple(args, "isi", &sockfd, &addrstr, &port)) return 0;
 
-    if( SOCKET_ERROR == WSAStringToAddress( addrstr, AF_BTH, NULL, 
+    if( SOCKET_ERROR == WSAStringToAddressA( addrstr, AF_BTH, NULL, 
                 (LPSOCKADDR)&sa, &sa_len ) ) {
         Err_SetFromWSALastError(PyExc_IOError);
         return 0;
     }
     sa.addressFamily = AF_BTH;
     sa.port = port;
-    
     Py_BEGIN_ALLOW_THREADS;
     status = connect(sockfd, (LPSOCKADDR)&sa, sizeof(sa));
     Py_END_ALLOW_THREADS;
@@ -293,7 +293,7 @@ msbt_recv(PyObject *self, PyObject *args)
     if(!PyArg_ParseTuple(args, "ii|i", &sockfd, &datalen, &flags))
         return 0;
 
-    buf = PyUnicode_FromStringAndSize((char*)0, datalen);
+    buf = PyBytes_FromStringAndSize((char*)0, datalen);
     Py_BEGIN_ALLOW_THREADS;
     received = recv(sockfd, PyBytes_AS_STRING(buf), datalen, flags);
     Py_END_ALLOW_THREADS;
