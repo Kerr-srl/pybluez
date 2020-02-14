@@ -226,11 +226,11 @@ def stop_advertising (sock):
     sock._raw_sdp_record = None
     sock._sdp_handle = None
 
-def find_service (name = None, uuid = None, address = None):
+def find_service (name = None, uuid = None, address = None, duration = 8):
     if address is not None:
         addresses = [ address ]
     else:
-        addresses = discover_devices (lookup_names = False)
+        addresses = discover_devices (lookup_names = False, duration = duration)
 
     results = []
 

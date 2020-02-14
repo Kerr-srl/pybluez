@@ -280,9 +280,9 @@ def stop_advertising (sock):
     except _bt.error as e:
         raise BluetoothError (*e.args)
 
-def find_service (name = None, uuid = None, address = None):
+def find_service (name = None, uuid = None, address = None, duration = 8):
     if not address:
-        devices = discover_devices ()
+        devices = discover_devices (duration = duration)
     else:
         devices = [ address ]
 

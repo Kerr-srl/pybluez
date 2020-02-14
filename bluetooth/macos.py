@@ -35,11 +35,11 @@ def lookup_name(address, timeout=10):
 # (e.g., CID/PSM, protocol, provider information).
 #
 # See: _searchservices() in _lightblue.py
-def find_service(name=None, uuid=None, address=None):
+def find_service(name=None, uuid=None, address=None, duration = 8):
     if address is not None:
         addresses = [address]
     else:
-        addresses = discover_devices(lookup_names=False)
+        addresses = discover_devices(lookup_names=False, duration=duration)
 
     results = []
 
