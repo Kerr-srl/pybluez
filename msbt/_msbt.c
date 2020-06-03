@@ -23,9 +23,9 @@ static void dbg(const char *fmt, ...)
 #endif
 
 
-static void Err_SetFromWSALastError(PyObject *exc)
+static void Err_SetFromWSALastError()
 {
-	LPVOID lpMsgBuf;
+	/*LPVOID lpMsgBuf;
 	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL, WSAGetLastError(), 0, (LPTSTR) &lpMsgBuf, 0, NULL );
 	PyObject *msg = PyUnicode_FromWideChar((LPTSTR) lpMsgBuf, -1);
@@ -33,12 +33,13 @@ static void Err_SetFromWSALastError(PyObject *exc)
 	if (msg != NULL) {
 		PyErr_SetObject( exc, msg );
 		Py_DECREF(msg);
-	}
+	}*/
+	PyErr_SetFromWindowsErr(WSAGetLastError());
 }
 
 
 #define _CHECK_OR_RAISE_WSA(cond) \
-        if( !(cond) ) { Err_SetFromWSALastError( PyExc_IOError ); return 0; }
+        if( !(cond) ) { Err_SetFromWSALastError(); return 0; }
 
 static void
 ba2str( BTH_ADDR ba, char *addr, size_t len )
