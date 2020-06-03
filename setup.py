@@ -31,7 +31,7 @@ zip_safe = True
 
 if sys.platform == 'win32':
     ext_modules.append(Extension('bluetooth._msbt',
-                       libraries=["WS2_32", "Irprops"],
+                       libraries=["WS2_32", "bthprops"],
                        sources=['msbt\\_msbt.c']))
 
     # widcomm
@@ -125,7 +125,7 @@ setup(name='PyBluez',
                 'with GNU/Linux, macOS, and Windows.',
       maintainer='Piotr Karulis',
       license='GPL',
-      extras_require={'ble': ['gattlib==0.20150805']},
+      extras_require={'ble': ['gattlib']},
       package_dir=package_dir,
       use_2to3=True,
       install_requires=install_requires,
